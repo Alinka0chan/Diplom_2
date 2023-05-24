@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 
 public class OrdersUserGetTest {
@@ -23,6 +22,7 @@ public class OrdersUserGetTest {
     private UserClient userClient;
     private User user;
     private String userAccessToken;
+
     @Before
     public void setUp() {
         userClient = new UserClient();
@@ -31,7 +31,9 @@ public class OrdersUserGetTest {
         userAccessToken = registerResponse.extract().path("accessToken");
         ordersClient = new OrdersClient();
         orders = OrdersGenerator.getOrders();
+        ordersClient.createOrders(userAccessToken, orders);
     }
+
     @Test
     @DisplayName("Успешное получение заказов конкретного пользователя.")
     @Description("Проверка кода состояния и значения поля для /api/orders (успешный запрос)")
@@ -42,6 +44,7 @@ public class OrdersUserGetTest {
                 .body("success", equalTo(true));
 
     }
+
     @Test
     @DisplayName("Не успешное получение заказов конкретного пользователя без аторизации.")
     @Description("Проверка кода состояния и значения поля для /api/orders (без accessToken)")
@@ -52,6 +55,7 @@ public class OrdersUserGetTest {
                 .body("success", equalTo(false));
         assertEquals("You should be authorised", ordersClientResponse.extract().path("message"));
     }
+
     @After
     public void cleanUp() {
         if (userAccessToken != null) {
